@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LabNode Manual</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        /* --- BASIC LAYOUT --- */
+        body { margin: 0; padding: 0; font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; height: 100vh; color: #333; }
+        a { text-decoration: none; color: inherit; cursor: pointer; }
+        ul { list-style: none; padding: 0; margin: 0; }
+
+        /* --- SIDEBAR --- */
+        .sidebar { width: 300px; background-color: #343131; color: #d9d9d9; display: flex; flex-direction: column; height: 100vh; flex-shrink: 0; }
+        .sidebar-header { background-color: #2980b9; padding: 20px; text-align: center; }
+        .sidebar-header h3 { margin: 0; color: white; }
+        
+        /* Search Bar */
+        .search-container { padding: 15px; background-color: #2d2a2a; border-bottom: 1px solid #444; }
+        .search-input { width: 90%; padding: 8px; border-radius: 4px; border: 1px solid #555; background-color: #403d3d; color: white; outline: none; }
+        .search-input::placeholder { color: #aaa; }
+        
+        /* Menu Items */
+        .nav-menu { overflow-y: auto; flex-grow: 1; }
+        .nav-item { display: block; padding: 12px 20px; border-bottom: 1px solid #444; transition: background 0.2s; }
+        .nav-item:hover { background-color: #4e4a4a; color: white; }
+        .nav-item.active { background-color: #242121; border-left: 4px solid #2980b9; }
+
+        /* Submenu */
+        .submenu { display: none; background-color: #2a2828; }
+        .submenu .nav-item { padding-left: 40px; border-bottom: none; font-size: 0.9em; }
+
+        /* --- MAIN CONTENT --- */
+        .main-content { flex-grow: 1; padding: 40px 60px; overflow-y: auto; background-color: #fff; }
+
+        /* Breadcrumbs */
+        .breadcrumbs { display: flex; justify-content: space-between; padding-bottom: 15px; margin-bottom: 30px; border-bottom: 1px solid #eee; color: #555; }
+        .home-icon { font-size: 1.2rem; margin-right: 5px; }
+
+        /* Markdown Styling */
+        #markdown-content { line-height: 1.6; max-width: 800px; }
+        #markdown-content h1 { border-bottom: 1px solid #eee; padding-bottom: 10px; color: #2c3e50; }
+        #markdown-content pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        #markdown-content code { background: #f4f4f4; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <img src="figures/Logo.png" alt="Logo" style="width: 40px; height: 40px;">
+                <h3>LabNode Manual v.1</h3>
+            </div>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search docs..." onkeyup="performSearch()">
+        </div>
+
+        <ul class="nav-menu" id="mainMenu">
+            <li><a onclick="loadPage('md/README_plot.md')" class="nav-item active">1. This documentation</a></li>
+            <li><a onclick="loadPage('md/README_project.md')" class="nav-item">2. Project Management</a></li>
+            <li>
+                <a onclick="toggleSubmenu('import_data_list')" class="nav-item" style="display: flex; justify-content: space-between;">
+                    3. Import Lab Data <span>▼</span>
+                </a>
+                <ul id="import_data_list" class="submenu">
+                    <li><a onclick="loadPage('md/README_project.md')" class="nav-item">3.1 Plant Data (Frankfurt)</a></li>
+                    <li><a onclick="loadPage('md/README_plot.md')" class="nav-item">3.2 GC Data (Weymouth)</a></li>
+                </ul>
+            </li>
+            <li><a onclick="loadPage('md/README_project.md')" class="nav-item">4. Sensors</a></li>
+            <li>
+                <a onclick="toggleSubmenu('process_diagram_list')" class="nav-item" style="display: flex; justify-content: space-between;">
+                    5. Process Diagram <span>▼</span>
+                </a>
+                <ul id="process_diagram_list" class="submenu">
+                    <li><a onclick="loadPage('md/README_project.md')" class="nav-item">5.1 Equipment Part</a></li>
+                    <li><a onclick="loadPage('md/README_plot.md')" class="nav-item">5.2 Non-equipment Part</a></li>
+                    <li><a onclick="loadPage('md/README_project.md')" class="nav-item">5.3 Sensor</a></li>
+                    <li><a onclick="loadPage('md/README_plot.md')" class="nav-item">5.4 Connector</a></li>
+                </ul>
+            </li>
+            <li><a onclick="loadPage('md/README_project.md')" class="nav-item">6. Template</a></li>
+            <li><a onclick="loadPage('md/README_plot.md')" class="nav-item">7. Data Plot</a></li>
+            <li><a onclick="loadPage('md/README_project.md')" class="nav-item">8. Event</a></li>
+            <li>
+                <a onclick="toggleSubmenu('theory_list')" class="nav-item" style="display: flex; justify-content: space-between;">
+                    9. Theory <span>▼</span>
+                </a>
+                <ul id="theory_list" class="submenu">
+                    <li><a onclick="loadPage('md/README_theory_Zscore.md')" class="nav-item">9.1 Plant Date Treatment</a></li>
+                    <li><a onclick="loadPage('md/README_theory_AutoCheck.md')" class="nav-item">9.2 Automatic Plant Data</a></li>
+                    <li><a onclick="loadPage('md/README_theory_GCDataProcessing.md')" class="nav-item">9.3 GC Data Compare</a></li>
+                </ul>
+            </li>
+        </ul>
+
+        <ul class="nav-menu" id="searchResults" style="display: none;"></ul>
+    </nav>
+
+    <main class="main-content">
+        <div class="breadcrumbs">
+            <div class="breadcrumb-left">
+                <span class="home-icon">🏠</span> 
+                <span style="color: #ccc;">/</span> 
+                <span id="breadcrumb-text">Loading...</span>
+            </div>
+        </div>
+
+        <div id="markdown-content">Loading...</div>
+    </main>
+
+    <script>
+        // --- GLOBAL VARIABLES ---
+        let searchIndex = [];
+
+        // --- 1. SEARCH INDEXER (Runs on Page Load) ---
+        async function initSearchIndex() {
+            // Select only items inside the Main Menu
+            const menuItems = document.querySelectorAll('#mainMenu .nav-item');
+            
+            console.log("Starting Search Indexing...");
+            
+            for (let item of menuItems) {
+                // Get filename from onclick="loadPage('file.md')"
+                const onclickText = item.getAttribute('onclick');
+                if (!onclickText) continue; // Skip toggle buttons
+                
+                const match = onclickText.match(/loadPage\('([^']+)'\)/);
+                if (match && match[1]) {
+                    const filename = match[1];
+                    const title = item.innerText.trim(); 
+                    
+                    try {
+                        const res = await fetch(filename);
+                        if (res.ok) {
+                            const text = await res.text();
+                            searchIndex.push({
+                                title: title,
+                                filename: filename,
+                                content: text.toLowerCase(),
+                                rawContent: text
+                            });
+                        }
+                    } catch (e) {
+                        console.warn(`Search Indexer: Could not read ${filename}`);
+                    }
+                }
+            }
+            console.log(`Indexing complete. ${searchIndex.length} pages indexed.`);
+        }
+
+        // --- 2. PERFORM SEARCH (Runs on KeyUp) ---
+        function performSearch() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const mainMenu = document.getElementById('mainMenu');
+            const resultsMenu = document.getElementById('searchResults');
+
+            if (!mainMenu || !resultsMenu) return; // Safety check
+
+            // If query is short, show normal menu
+            if (query.length < 2) {
+                mainMenu.style.display = 'block';
+                resultsMenu.style.display = 'none';
+                return;
+            }
+
+            // Filter results
+            const results = searchIndex.filter(page => 
+                page.title.toLowerCase().includes(query) || 
+                page.content.includes(query)
+            );
+
+            // Hide Main Menu, Show Results
+            mainMenu.style.display = 'none';
+            resultsMenu.style.display = 'block';
+            resultsMenu.innerHTML = '';
+
+            if (results.length === 0) {
+                resultsMenu.innerHTML = '<li style="padding:15px; color:#aaa;">No results found.</li>';
+                return;
+            }
+
+            // Render Results with Snippets
+            results.forEach(page => {
+                let snippet = "Found in title";
+                const idx = page.content.indexOf(query);
+                
+                // Create a text snippet around the found word
+                if (idx !== -1) {
+                    const start = Math.max(0, idx - 30);
+                    const end = Math.min(page.rawContent.length, idx + 50);
+                    snippet = "..." + page.rawContent.substring(start, end) + "...";
+                }
+
+                resultsMenu.innerHTML += `
+                    <li><a onclick="loadPage('${page.filename}'); clearSearch();" class="nav-item">
+                        <div style="font-weight:bold; color:#2980b9;">${page.title}</div>
+                        <div style="font-size:0.8em; color:#888; margin-top:4px;">${snippet}</div>
+                    </a></li>`;
+            });
+        }
+
+        // --- 3. UTILITY: Clear Search ---
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('mainMenu').style.display = 'block';
+            document.getElementById('searchResults').style.display = 'none';
+        }
+
+        // --- 4. PAGE LOADER ---
+        async function loadPage(filename) {
+            const contentDiv = document.getElementById('markdown-content');
+            const breadcrumbText = document.getElementById('breadcrumb-text');
+            
+            try {
+                const response = await fetch(filename);
+                if (!response.ok) throw new Error("File not found");
+                const text = await response.text();
+                contentDiv.innerHTML = marked.parse(text);
+
+                if (window.MathJax) MathJax.typesetPromise([contentDiv]);
+
+                // Update Breadcrumb & Highlight
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                
+                const activeLink = document.querySelector(`a[onclick*="${filename}"]`);
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                    
+                    // Breadcrumb Logic
+                    let displayTitle = activeLink.innerText.split('\n')[0]; 
+                    const parentSubmenu = activeLink.closest('.submenu');
+                    
+                    if (parentSubmenu) {
+                        const parentTitle = parentSubmenu.parentElement.querySelector('a').innerText.split('\n')[0].replace('▼','').trim();
+                        breadcrumbText.innerHTML = `${parentTitle} <span style="color:#ccc;">/</span> ${displayTitle}`;
+                    } else {
+                        breadcrumbText.innerText = displayTitle;
+                    }
+                }
+
+            } catch (error) {
+                contentDiv.innerHTML = `<h1>Error</h1><p>Cannot load ${filename}. Check file name or run Live Server.</p>`;
+            }
+        }
+
+        // --- 5. TOGGLE SUBMENU ---
+        function toggleSubmenu(id) {
+            var submenu = document.getElementById(id);
+            if(submenu) submenu.style.display = (submenu.style.display === "block") ? "none" : "block";
+        }
+
+        // --- INIT ---
+        window.onload = function() {
+            loadPage('md/README_project.md'); // Load default page
+            initSearchIndex(); // Start Indexer
+        };
+    </script>
+</body>
+</html>
